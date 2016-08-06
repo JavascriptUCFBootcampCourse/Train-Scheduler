@@ -1,22 +1,21 @@
 //Calculate train's next arrival and how far away it is
 var timeCalc = function(firstTrainTime, frequency) {
 
-	//Retrieve localStorage data
-	var firstTimeCalc = firstTrainTime;
-	var frequencyCalc = frequency;
+	var firstMoment = moment(firstTrainTime, "hh:mm");
 
-	//Use moment.js to pull current time
-	var currentTime = moment().format("MM/DD/YY hh:mm A");
-	
-	//Determine nextArrival
-	var nextArrival = moment(currentTime).format("hh:mm");
-	
-	//Determine minutesAway
-	var minutesAway = moment(currentTime).diff( firstTimeCalc, "minutes");
+	var currentMoment = moment();
+
+	var totalRunTime = currentMoment.diff(firstMoment, "minutes");
+
+	var numberOfRuns = Math.floor(totalRunTime / frequency);
+
+	var lastRunMoment = firstMoment.add(numberOfRuns * frequency, "minutes");
+
+	var nextRunMoment = lastRunMoment.add(frequency, "minutes");
 
 	return {
-		nextArrival: nextArrival,
-		minutesAway: minutesAway
+		nextArrival: nextRunMoment.format('hh:mm A'),
+		minutesAway: nextRunMoment.from(currentMoment, "minutes")
 	}
 };
 
@@ -37,26 +36,12 @@ for (var i = 0; i < currentSchedule.length; i++) {
 
 	updateDisplay(line.trainName, line.destination, line.firstTrainTime, line.frequency);
 }
-
-//Variables
-//User input
-/*var trainName = localStorage.getItem("trainName") || '';
-var destination = localStorage.getItem("destination") || '';
-var firstTime = localStorage.getItem("firstTrainTime") || 0;
-var frequency = localStorage.getItem("frequency") || 0;*/
-
-//moment.js input
-/*var nextArrival = 0;
-var minutesAway = 0;*/
-
-//Functions
-//Submit button clicked
 $('button').on('click', function(){
 
 	var schedule = {
 		trainName: $('#trainName').val().trim(),
 		destination: $('#destination').val().trim(),
-		firstTime: $('#firstTrainTime').val(),
+		firstTrainTime: $('#firstTrainTime').val(),
 		frequency: $('#frequency').val()
 	}
 
@@ -64,20 +49,6 @@ $('button').on('click', function(){
 
 	localStorage.setItem('currentSchedule', JSON.stringify(currentSchedule));
 
-	//Grab input value and set to variables
-	/*trainName = $('#trainName').val().trim();
-	destination = $('#destination').val().trim();
-	firstTime = $('#firstTrainTime').val();
-	frequency = $('#frequency').val();
-
-	//Add variables to localStorage
-	localStorage.setItem("trainName", trainName);
-	localStorage.setItem("destination", destination);
-	localStorage.setItem("firstTrainTime", firstTime);
-	localStorage.setItem("frequency", frequency);*/
-	
-	//Clear input
-	//RESET BUTTON?
 
 	updateDisplay(schedule.trainName, schedule.destination, schedule.firstTrainTime, schedule.frequency);
 });
